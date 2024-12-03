@@ -1,9 +1,11 @@
 # Previously on Preprocessing.R ...
 # Imported data, labeled and distinguished numeric vs factr
 # Normalize - Min-Max Scaling
-# Split - 5-fold 
 # Feature Selection - Boruta
+# Split - 5-fold 
 
+# saveRDS(folds, "folds.rds")
+folds <- readRDS("folds.rds")
 
 ### Random Forest ###
 # Required packages
@@ -115,6 +117,8 @@ print(get_mean_metrics(results_simple))
 cat("\nTuned Random Forest Results:\n")
 print(get_mean_metrics(results_tuned))
 
+# saveRDS(results_simple, "rf_simple.rds")
+# saveRDS(results_tuned, "rf_tuned.rds")
 
 ### SMOTE ###
 library(recipes)
@@ -186,8 +190,9 @@ print("Variable importance (from first fold):")
 importance(results_smote[[1]]$model)
 varImpPlot(results_smote[[1]]$model)
 
+# saveRDS(results_smote, "rf_simple_smote.rds")
 
-### Compare Original vs Smote ###
+### Compare Tuned vs Smote ###
 # Function to run RF with SMOTE and evaluate
 rf_tuned_with_smote <- function(train_data, test_data) {
   # Create and prepare SMOTE recipe
@@ -315,10 +320,6 @@ shap_values <- rf_shap_analysis(best_model, best_data, train_dummies)
 
 # Generate and print plot
 plot_shap_summary(shap_values, best_data)
-
-
-library(iml)
-library(ggplot2)
 
 # Function for comprehensive model interpretation
 rf_interpret <- function(model, data, training_columns) {

@@ -6,8 +6,9 @@ library(tidymodels)
 library(randomForest)
 library(caret)
 library(pROC)
+options(future.globals.maxSize = 1100 * 1024^2)
 
-results_smote <- readRDS("smote.rds")
+results_smote <- readRDS("rf_simple_smote.rds")
 folds <- readRDS("folds.rds")
 
 best_fold_index <- which.max(sapply(results_smote, function(x) x$metrics$AUC))
@@ -39,15 +40,18 @@ shapley <- Shapley$new(
 importance <- FeatureImp$new(predictor, loss = "ce")
 
 # Feature effects
-effects <- FeatureEffects$new(predictor, 
-                              features = names(best_data)[names(best_data) != "eq5d_cat"])
+valid_features <- names(which(sapply(best_data[!names(best_data) %in% "eq5d_cat"], 
+                                     function(x) length(unique(x))) > 1))
+effects <- FeatureEffects$new(predictor, features = valid_features)
+# effects <- FeatureEffects$new(predictor, 
+#                               features = names(best_data)[names(best_data) != "eq5d_cat"])
 
 # Most important feature analysis
 top_feature <- importance$results$feature[1]
 pdp <- FeatureEffect$new(predictor, feature = top_feature)
 
 # Generate plots
-shap_plot <- plot_shap_summary(shapley, best_data)
-imp_plot <- plot(importance)
-effects_plot <- plot(effects)
-pdp_plot <- plot(pdp)
+plot_shap_summary(shapley, best_data)
+plot(importance)
+plot(effects)
+plot(pdp)
