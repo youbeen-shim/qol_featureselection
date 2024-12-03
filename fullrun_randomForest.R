@@ -119,6 +119,7 @@ print(get_mean_metrics(results_tuned))
 
 # saveRDS(results_simple, "rf_simple.rds")
 # saveRDS(results_tuned, "rf_tuned.rds")
+results_simple <- readRDS("rf_simple.rds")
 
 ### SMOTE ###
 library(recipes)
